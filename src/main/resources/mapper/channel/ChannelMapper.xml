@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.loudg.api.yt.mapper.channel.ChannelMapper">
+  <select id="selectChannelInfo" parameterType="string" resultType="com.loudg.api.yt.vo.channel.ChannelVo">
+    SELECT c.id
+          , c.title
+          , c.description
+          , c.thumbnails
+          , c.banner
+          , c.publishedAt
+          , SUM(views) AS views
+          , SUM(estimatedMinutesWatched) AS estimatedMinutesWatched
+          , SUM(likes - dislikes) AS likes
+          , SUM(subscribersGained - subscribersLost) AS subscribers
+    FROM channel_stat cs INNER JOIN channel c ON cs.channelId = c.id ANd c.id = #{channelId}
+  </select>
+</mapper>

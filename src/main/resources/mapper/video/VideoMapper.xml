@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.loudg.api.yt.mapper.video.VideoMapper">
+  <select id="selectVideos" parameterType="string" resultType="com.loudg.api.yt.vo.video.VideoVo">
+    SELECT v.videoId
+          , title
+          , description
+          , thumbnails
+          , publishedAt
+          , CASE WHEN count_str(duration, ':') = 0 then TIME_FORMAT(concat('0:0:', duration), '00:%s')
+                 WHEN count_str(duration, ':') = 1 then TIME_FORMAT(concat('0:', duration), '%i:%s')
+            ELSE TIME_FORMAT(duration, '%H:%i:%s') END AS duration
+          , views
+          , estimatedMinutesWatched
+          , subscribers
+    FROM (
+          SELECT v.videoId
+                , title
+                , description
+                , thumbnails
+                , publishedAt
+                , REPLACE(REPLACE(REPLACE(REPLACE(v.duration, 'PT', ''), 'S', ''), 'M', ':'), 'H', ':') AS duration
+                , views
+                , estimatedMinutesWatched
+                , subscribers
+          FROM video v INNER JOIN (
+                SELECT vs.videoId
+                      , sum(views) as views
+                      , sum(estimatedMinutesWatched) as estimatedMinutesWatched
+                      , sum(subscribersGained - subscribersLost) as subscribers
+                FROM video_stat vs
+                GROUP BY videoId
+          ) vs ON v.videoId = vs.videoId
+    ) v
+    ORDER BY publishedAt desc
+  </select>
+
+  <select id="selectVideoStat" parameterType="string" resultType="com.loudg.api.yt.vo.video.VideoStatVo">
+    SELECT v.videoId
+        , date
+        , views
+        , likes - dislikes AS likes
+        , estimatedMinutesWatched
+        , subscribersGained - subscribersLost AS subscribers
+    FROM video v INNER JOIN video_stat vs ON v.videoId = vs.videoId AND v.channelId = #{channelId}
+    WHERE date BETWEEN DATE_SUB(NOW(), INTERVAL 10 DAY) AND DATE_FORMAT(NOW(), '%Y-%m-%d')
+    ORDER BY videoId, date
+  </select>
+</mapper>

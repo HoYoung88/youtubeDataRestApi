@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.loudg.api.yt.mapper.playlist.PlaylistMapper">
+  <select id="selectPlaylist" parameterType="string" resultType="com.loudg.api.yt.vo.playlist.PlaylistVo">
+    /* 플레이리스트 총 데이터 */
+    SELECT sum(views) as views
+        , sum(estimatedMinutesWatched) as estimatedMinutesWatched
+        , sum(subscribersGained - subscribersLost) as subscribersGained
+        , p.title
+        , p.description
+        , p.channelId
+        , p.playlistId
+        , p.thumbnails
+        , vs.date
+    FROM video_stat vs INNER JOIN
+    (
+        SELECT p.channelId
+            ,	p.playlistId
+            , p.title
+            , p.description
+            , p.thumbnails
+            , pli.videoId
+        FROM playlist p inner join playlistItems pli on p.playlistId = pli.playlistId
+    ) as p on vs.videoId = p.videoId
+    WHERE date BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 2 MONTH), '%Y-%m-01') AND DATE_FORMAT(LAST_DAY(NOW()), '%Y-%m-%d')
+    GROUP BY p.playlistId
+    ORDER BY views DESC
+  </select>
+  <select id="selectPlaylistStatMonth" parameterType="string" resultType="com.loudg.api.yt.vo.playlist.PlaylistStatVo">
+    /* 플레이 리스트 전월대비 데이터 */
+    SELECT month
+        , views
+        , estimatedMinutesWatched
+        , subscribers
+        , playlistId
+        , ifnull(round(((views - viewsIncrease) / viewsIncrease) * 100), 0) as viewsIncreasPercent
+        , ifnull(round(((estimatedMinutesWatched - estimatedMinutesWatchedIncrease) / estimatedMinutesWatchedIncrease) * 100), 0) as estimatedMinutesWatchedIncreasPercent
+        , ifnull(round(((subscribers - subscribersIncrease) / subscribersIncrease) * 100), 0) as subscribersIncreaseIncreasPercent
+    FROM (
+            SELECT month
+                , views
+                , estimatedMinutesWatched
+                , subscribersGained AS subscribers
+                , playlistId
+                , LAG(views) OVER (PARTITION BY p.playlistId ORDER BY month ) as viewsIncrease
+                , LAG(estimatedMinutesWatched) OVER (PARTITION BY p.playlistId ORDER BY month) as estimatedMinutesWatchedIncrease
+                , LAG(subscribersGained) OVER (PARTITION BY p.playlistId ORDER BY month ) as subscribersIncrease
+            FROM (
+                  SELECT DATE_FORMAT(date, '%m') AS month
+                      , sum(views) as views
+                      , sum(estimatedMinutesWatched) as estimatedMinutesWatched
+                      , sum(subscribersGained - subscribersLost) as subscribersGained
+                      , p.playlistId
+                  FROM	video_stat vs inner join
+                      (
+                      SELECT p.channelId
+                          ,	p.playlistId
+                          , p.title
+                          , p.description
+                          , pli.videoId
+                      FROM playlist p inner join playlistItems pli on p.playlistId = pli.playlistId AND p.channelId = #{channelId}
+                      ) AS p on vs.videoId = p.videoId
+                  WHERE date BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 2 MONTH), '%Y-%m-01') AND DATE_FORMAT(LAST_DAY(NOW()), '%Y-%m-%d')
+                  GROUP BY p.playlistId, month
+            ) AS p
+            where playlistId is not null
+    ) AS p
+    WHERE month != DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 2 MONTH), '%m')
+    ORDER BY playlistId, month, views desc
+  </select>
+</mapper>

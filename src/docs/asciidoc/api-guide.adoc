@@ -1,0 +1,3 @@
+include::{snippets}/error-example/curl-request.adoc[]
+include::{snippets}/error-example/http-request.adoc[]
+include::{snippets}/error-example/http-response.adoc[]
