@@ -17,6 +17,11 @@ public class ChannelRestContoller extends CoreRestController {
   
   @GetMapping("/channel/{channelId}")
   public ResponseEntity<ChannelVo> channelInfo(@PathVariable("channelId") String channelId) {
+    ChannelVo channelVo = channelService.selectChannelInfo(channelId);
+    if(channelVo == null) {
+      return ResponseEntity.noContent().build();
+    }
+    
     return ResponseEntity.ok(channelService.selectChannelInfo(channelId));
   }
 }
