@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.loudg.api.yt.mapper.playlist.PlaylistMapper">
-  <select id="selectPlaylist" parameterType="string" resultType="com.loudg.api.yt.vo.playlist.PlaylistVo">
+  <select id="selectPlaylist"
+          parameterType="com.loudg.api.yt.entity.Playlist"
+          resultType="com.loudg.api.yt.entity.Playlist"
+  >
     /* 플레이리스트 총 데이터 */
     SELECT sum(views) as views
         , sum(estimatedMinutesWatched) as estimatedMinutesWatched
@@ -11,6 +14,7 @@
         , p.channelId
         , p.playlistId
         , p.thumbnails
+        , p.publishedAt
         , vs.date
     FROM video_stat vs INNER JOIN
     (
@@ -19,13 +23,20 @@
             , p.title
             , p.description
             , p.thumbnails
+            , p.publishedAt
             , pli.videoId
         FROM playlist p inner join playlistItems pli on p.playlistId = pli.playlistId
-    ) as p on vs.videoId = p.videoId
+        <if test="!@org.springframework.util.StringUtils@isEmpty(playlistId)">
+          <where>
+            p.playlistId = #{playlistId}
+          </where>
+        </if>
+    ) AS p on vs.videoId = p.videoId
     WHERE date BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 2 MONTH), '%Y-%m-01') AND DATE_FORMAT(LAST_DAY(NOW()), '%Y-%m-%d')
     GROUP BY p.playlistId
     ORDER BY views DESC
   </select>
+
   <select id="selectPlaylistStatMonth" parameterType="string" resultType="com.loudg.api.yt.vo.playlist.PlaylistStatVo">
     /* 플레이 리스트 전월대비 데이터 */
     SELECT month

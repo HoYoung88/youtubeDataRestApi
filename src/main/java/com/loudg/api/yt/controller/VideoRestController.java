@@ -11,15 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-
 @RestController
 public class VideoRestController extends CoreRestController {
-  
+
   @Autowired
   private VideoService videoService;
-  
+
   @GetMapping("/channel/{channelId}/videos")
-  public ResponseEntity<List<VideoVo>> videos(@PathVariable("channelId") String channelId) {
+  public ResponseEntity<List<VideoVo>> videos(
+      @PathVariable("channelId") String channelId
+  ) {
     return ResponseEntity.ok(videoService.findVideoList(channelId));
   }
 }

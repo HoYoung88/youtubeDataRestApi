@@ -25,7 +25,7 @@
 
   </logger>
 
-  <logger name="com.loudg.api.yt"	level="INFO">
+  <logger name="com.loudg.api.yt"	level="DEBUG">
     <appender-ref ref="console" />
   </logger>
 

@@ -2,26 +2,17 @@ package com.loudg.api.yt.vo.playlist;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.loudg.api.yt.handler.type.JsonNodeValue;
+import com.loudg.api.yt.vo.core.BaseChannelVo;
 import lombok.Data;
+import lombok.Getter;
 
-@Data
-public class PlaylistVo {
-  long views;
-  long estimatedMinutesWatched;
-  long subscribersGained;
-  String title;
-  String description;
-  String channelId;
-  String playlistId;
-  String thumbnails;
-  StatVo stat;
-  
-  public JsonNode getThumbnails() {
-    return JsonNodeValue.from(this.thumbnails).get();
+import java.util.function.Supplier;
+
+@Getter
+public class PlaylistVo extends BaseChannelVo {
+  public String playlistId;
+
+  public void setPlaylistId(Supplier<String> playlistId) {
+    this.playlistId = playlistId.get();
   }
-  
-  public void setThumbnails(String thumbnails) {
-    this.thumbnails = thumbnails;
-  }
-  
 }

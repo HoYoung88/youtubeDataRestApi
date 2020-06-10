@@ -1,17 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.loudg.api.yt.mapper.channel.ChannelMapper">
-  <select id="selectChannelInfo" parameterType="string" resultType="com.loudg.api.yt.vo.channel.ChannelVo">
-    SELECT c.id
-          , c.title
-          , c.description
-          , c.thumbnails
-          , c.banner
-          , c.publishedAt
-          , SUM(views) AS views
-          , SUM(estimatedMinutesWatched) AS estimatedMinutesWatched
-          , SUM(likes - dislikes) AS likes
-          , SUM(subscribersGained - subscribersLost) AS subscribers
+  <select id="selectChannelInfo"
+          parameterType="com.loudg.api.yt.entity.Channel"
+          resultType="com.loudg.api.yt.entity.Channel"
+  >
+    SELECT
+        c.id AS channelId
+      , c.title
+      , c.description
+      , c.thumbnails
+      , c.banner
+      , c.publishedAt
+      , SUM(views) AS views
+      , SUM(estimatedMinutesWatched) AS estimatedMinutesWatched
+      , SUM(likes - dislikes) AS likes
+      , SUM(subscribersGained - subscribersLost) AS subscribers
     FROM channel_stat cs INNER JOIN channel c ON cs.channelId = c.id ANd c.id = #{channelId}
+  </select>
+
+  <select id="selectChannelStat"
+          parameterType="com.loudg.api.yt.entity.ChannelStat"
+          resultType="com.loudg.api.yt.entity.ChannelStat"
+  >
+    SELECT
+          cs.channelId
+        , cs.date
+        , cs.views
+        , cs.estimatedMinutesWatched
+        , cs.likes - cs.dislikes AS likes
+        , cs.subscribersGained - cs.subscribersLost AS subscribers
+      FROM channel c INNER JOIN channel_stat cs ON c.id = cs.channelId
+    WHERE cs.date BETWEEN DATE_SUB(NOW(), INTERVAL 10 DAY) AND DATE_FORMAT(NOW(), '%Y-%m-%d')
   </select>
 </mapper>
