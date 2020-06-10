@@ -9,7 +9,7 @@ server:
 spring:
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mysql://prod-loud-rdb.cjjhqpxgxinp.ap-northeast-2.rds.amazonaws.com:3306/YoutubeAnalytics
+    url: jdbc:log4jdbc:mysql://localhost:3306/YoutubeAnalytics
     username: loud
     password: spotvgames#1
   jackson:
