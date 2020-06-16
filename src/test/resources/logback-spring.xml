@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <property name="LOG_PATTERN"    value="▶ %-5level %d{yyyy-MM-dd HH:mm:ss} %-50logger{36}[line : %line] - %msg%n%ex{5}" />
+
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+      <pattern>
+        ${LOG_PATTERN}
+      </pattern>
+    </encoder>
+  </appender>
+
+  <logger name="org.springframework" level="INFO" additivity="false">
+    <appender-ref ref="console" />
+  </logger>
+
+  <logger name="org.springframework.test" level="INFO" >
+    <appender-ref ref="console" />
+  </logger>
+
+  <logger name="com.loudg.api.yt"	level="DEBUG">
+    <appender-ref ref="console" />
+  </logger>
+
+  <logger name="jdbc.resultsettable"	level="DEBUG">
+    <appender-ref ref="console" />
+  </logger>
+  <logger name="jdbc.sqltiming" 		level="DEBUG">
+    <appender-ref ref="console" />
+  </logger>
+
+  <logger name="jdbc.connection" level="DEBUG"></logger>
+  <logger name="jdbc.resultset"  level="DEBUG"></logger>
+  <logger name="jdbc.sqlonly"	level="DEBUG"></logger>
+  <logger name="jdbc.audit"	level="DEBUG"></logger>
+
+</configuration>
+

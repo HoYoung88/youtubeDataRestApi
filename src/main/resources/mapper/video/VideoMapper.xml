@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.loudg.api.yt.mapper.video.VideoMapper">
-  <select id="selectVideos" parameterType="string" resultType="com.loudg.api.yt.vo.video.VideoVo">
+  <select id="selectVideos"
+          parameterType="com.loudg.api.yt.entity.Video"
+          resultType="com.loudg.api.yt.entity.Video">
     SELECT v.videoId
           , title
           , description
@@ -31,19 +33,10 @@
                 FROM video_stat vs
                 GROUP BY videoId
           ) vs ON v.videoId = vs.videoId
+          WHERE v.channelId = #{channelId}
     ) v
     ORDER BY publishedAt desc
+    LIMIT #{page}, #{rowCount}
   </select>
 
-  <select id="selectVideoStat" parameterType="string" resultType="com.loudg.api.yt.vo.video.VideoStatVo">
-    SELECT v.videoId
-        , date
-        , views
-        , likes - dislikes AS likes
-        , estimatedMinutesWatched
-        , subscribersGained - subscribersLost AS subscribers
-    FROM video v INNER JOIN video_stat vs ON v.videoId = vs.videoId AND v.channelId = #{channelId}
-    WHERE date BETWEEN DATE_SUB(NOW(), INTERVAL 10 DAY) AND DATE_FORMAT(NOW(), '%Y-%m-%d')
-    ORDER BY videoId, date
-  </select>
 </mapper>

@@ -1,16 +1,16 @@
 package com.loudg.api.yt.entity;
 
 import lombok.Data;
-
 import java.util.Date;
 
 @Data
-public class Playlist {
-  String playlistId;
+public class Video  {
+  String channelId;
+  String videoId;
   String title;
   String description;
   String thumbnails;
-  String channelId;
+  String duration;
   Date publishedAt;
 
   long views;

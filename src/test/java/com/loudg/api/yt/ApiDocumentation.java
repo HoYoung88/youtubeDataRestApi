@@ -31,15 +31,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class ApiDocumentation {
   
   @Autowired
-  private WebApplicationContext context;
-  
-  private RestDocumentationResultHandler documentationHandler;
-  
-  private MockMvc mockMvc;
+  protected WebApplicationContext context;
+
+  protected RestDocumentationResultHandler documentationHandler;
+
+  protected MockMvc mockMvc;
   
   @BeforeEach
   public void setUp(RestDocumentationContextProvider restDocumentation) {
-    this.documentationHandler = document("{method-name}",
+    this.documentationHandler = document("{class-name}/{method-name}",
         preprocessRequest(prettyPrint()),
         preprocessResponse(prettyPrint()));
   

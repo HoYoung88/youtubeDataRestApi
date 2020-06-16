@@ -13,17 +13,20 @@ public class BaseChannelVo {
   @JsonIgnore
   @Getter
   public String channelId;
-  @Getter
-  public String title;
-  @Getter
-  public String description;
-  @Setter
+  @Getter public String title;
+  @Getter public String description;
   public String thumbnails;
-  @Getter
-  public Date publishedAt;
+  @Getter public Date publishedAt;
+  @Getter public Long views;
+  @Getter public Long estimatedMinutesWatched;
+  @Getter public Long subscribers;
 
   public JsonNode getThumbnails() {
     return JsonNodeValue.from(this.thumbnails).get();
+  }
+
+  public void setThumbnails(Supplier<String> thumbnails) {
+    this.thumbnails = thumbnails.get();
   }
 
   public void setChannelId(Supplier<String> channelId) {
@@ -38,11 +41,19 @@ public class BaseChannelVo {
     this.description = description.get();
   }
 
-  public void setThumbnails(Supplier<String> thumbnails) {
-    this.thumbnails = thumbnails.get();
-  }
-
   public void setPublishedAt(Supplier<Date> publishedAt) {
     this.publishedAt = publishedAt.get();
+  }
+
+  public void setViews(Supplier<Long> views) {
+    this.views = views.get();
+  }
+
+  public void setEstimatedMinutesWatched(Supplier<Long> estimatedMinutesWatched) {
+    this.estimatedMinutesWatched = estimatedMinutesWatched.get();
+  }
+
+  public void setSubscribers(Supplier<Long> subscribers) {
+    this.subscribers = subscribers.get();
   }
 }
